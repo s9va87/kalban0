@@ -4,6 +4,9 @@ import React, {useState} from 'react'
 import {Button} from "reactstrap";
 import Modal from './Modal'
 import ModalDelete from "./Modal";
+import Comments from "./Comments";
+import List from "./List";
+import axios from 'axios';
 
 
 const statuses = ['todo', 'progress', 'rewiew', 'done']
@@ -58,7 +61,7 @@ function App() {
 
     const [oldTask, setOldTask] = useState(initialDelete)
     const [modal, setModal] = useState(false);
-    const [toggle, setToggle] = useState(true)
+    const [listStyle, setListStyle] = useState('list')
 
 
     const addNewTask = () => {
@@ -68,8 +71,8 @@ function App() {
             status: statuses[Math.floor(Math.random() * 4)],
             priority: 2
         }
-        const newTaask = [...tasks, newTask]
-        setTasks(newTaask)
+        const newTasks = [...tasks, newTask]
+        setTasks(newTasks)
     }
 
     const deleteTask = (taskId, statusOld) => {
@@ -119,27 +122,55 @@ function App() {
     // const basket = () => {
     //
     // }
-    const style = 'row ling-item-start'
+    // const style = 'row ling-item-start'
     // let done;
     // if (toggle ) {
     //     done = style
     // } else { done = ''}
-    // const done = toggle       ? style                 : ''
-    let done;
-    if (toggle) {
-        done = style
-    } else {
-        done = ''
-    }
+    // const done = listStyle       ? style                 : ''
+    // let done;
+    // if (listStyle) {
+    //     done = style
+    // } else {
+    //     done = ''
+    // }
 
-    const changeStyle = () => {
-        setToggle(!toggle)
-        console.log(toggle)
-    }
 
+
+
+
+
+
+    // const changeStyle = () => {
+    //     setListStyle(!listStyle)
+    //     console.log(listStyle)
+    // }
+    const getCards = () => {
+        axios.get('https://nazarov-kanban-server.herokuapp.com/card')
+            .then((res) => {
+                console.log(res)
+                setTasks(res.data)
+            })
+            .catch((err) => {
+                console.log(err)
+            })
+    }
+    const deleteCard =(id)=> {
+        axios.delete('https://nazarov-kanban-server.herokuapp.com/card/$(id)')
+            .then((res) => {
+                console.log(res)
+                getCards()
+            })
+            .catch((err) => {
+                console.log(err)
+            })
+    }
 
     return (
-        <div className="container">
+        <Container>
+            {listStyle === 'list' && <List/>}
+            {listStyle === 'list' && <List/>}
+            <List/>
 
             <Button onClick={addNewTask}>Add New Task</Button>
             <button onClick={changeStyle}>style</button>
@@ -163,9 +194,11 @@ function App() {
 
                 </div>))}
                     <Button color="danger" onClick={()=>setModal(!modal)}>basket</Button>
+                <Comments modal={modal}
+                          setModal={setModal}/>
             </div>
 
-        </div>
+        </Container>
     );
 }
 
